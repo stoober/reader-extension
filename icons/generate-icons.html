@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate Icons</title></head>
+<body>
+<p>Right-click each canvas and save as PNG with the filename shown:</p>
+<div style="display:flex;gap:20px;align-items:end;">
+  <div>
+    <canvas id="c16" width="16" height="16"></canvas>
+    <p>icon16.png</p>
+  </div>
+  <div>
+    <canvas id="c48" width="48" height="48"></canvas>
+    <p>icon48.png</p>
+  </div>
+  <div>
+    <canvas id="c128" width="128" height="128"></canvas>
+    <p>icon128.png</p>
+  </div>
+</div>
+<script>
+function drawIcon(canvas) {
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+  // Background
+  ctx.fillStyle = '#ffeb3b';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, s, s, s * 0.15);
+  ctx.fill();
+  // Book icon
+  ctx.fillStyle = '#333';
+  const m = s * 0.2;
+  ctx.fillRect(m, m, s - m * 2, s - m * 2);
+  ctx.fillStyle = '#ffeb3b';
+  ctx.fillRect(m + s * 0.08, m + s * 0.1, s - m * 2 - s * 0.16, s * 0.08);
+  ctx.fillRect(m + s * 0.08, m + s * 0.25, s - m * 2 - s * 0.16, s * 0.08);
+  ctx.fillRect(m + s * 0.08, m + s * 0.4, s * 0.3, s * 0.08);
+}
+drawIcon(document.getElementById('c16'));
+drawIcon(document.getElementById('c48'));
+drawIcon(document.getElementById('c128'));
+</script>
+</body>
+</html>

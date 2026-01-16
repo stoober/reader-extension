@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reader</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Reader</h1>
+      <p class="subtitle">Your saved articles</p>
+    </header>
+
+    <div class="search-container">
+      <input type="text" id="search-input" class="search-input" placeholder="Search articles...">
+      <div class="filters-row">
+        <div class="search-scope">
+          <button class="scope-btn active" data-scope="all">All</button>
+          <button class="scope-btn" data-scope="saved">Saved</button>
+          <button class="scope-btn" data-scope="read-later">Read Later</button>
+          <span class="scope-divider"></span>
+          <button class="scope-btn" data-scope="favorites">Favorites</button>
+          <button class="scope-btn" data-scope="highlights">Highlights</button>
+        </div>
+        <div class="sort-controls">
+          <label class="sort-label">Sort:</label>
+          <select id="sort-select" class="sort-select">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <section class="section" id="favorites-section">
+        <h2 class="section-title">Favorites</h2>
+        <div class="articles-grid" id="favorites-list"></div>
+        <p class="empty-state" id="favorites-empty">No favorite articles yet. Click the star on any article to add it to favorites.</p>
+      </section>
+
+      <section class="section" id="read-later-section">
+        <h2 class="section-title">Read Later</h2>
+        <div class="articles-grid" id="read-later-list"></div>
+        <p class="empty-state" id="read-later-empty">No articles in your reading list. Click the extension icon on any page to add one.</p>
+      </section>
+
+      <section class="section" id="saved-section">
+        <h2 class="section-title">Saved</h2>
+        <div class="articles-grid" id="saved-list"></div>
+        <p class="empty-state" id="saved-empty">No saved articles yet.</p>
+      </section>
+
+      <section class="section" id="highlights-section" style="display: none;">
+        <h2 class="section-title">All Highlights</h2>
+        <div class="highlights-list" id="highlights-list"></div>
+        <p class="empty-state" id="highlights-empty">No highlights yet. Select text on any page and click "Highlight" to save it.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>
