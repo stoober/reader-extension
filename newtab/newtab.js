@@ -80,58 +80,51 @@ function renderFilteredArticles() {
   });
 
   // Apply scope filter
-  let favorites, readLater, saved;
+  let readLater, saved;
   if (currentScope === 'favorites') {
-    favorites = filtered.filter(a => a.isFavorite);
-    readLater = [];
-    saved = [];
+    // Favorites tab: show only favorites, split by read status
+    readLater = filtered.filter(a => a.isFavorite && !a.isRead);
+    saved = filtered.filter(a => a.isFavorite && a.isRead);
   } else if (currentScope === 'read-later') {
-    favorites = [];
     readLater = filtered.filter(a => !a.isRead);
     saved = [];
   } else if (currentScope === 'saved') {
-    favorites = [];
     readLater = [];
     saved = filtered.filter(a => a.isRead);
   } else {
-    favorites = filtered.filter(a => a.isFavorite);
+    // All: show both sections
     readLater = filtered.filter(a => !a.isRead);
     saved = filtered.filter(a => a.isRead);
   }
 
-  renderArticles('favorites-list', favorites, highlightCounts);
   renderArticles('read-later-list', readLater, highlightCounts);
   renderArticles('saved-list', saved, highlightCounts);
 
   // Show/hide empty states
-  const favoritesEmpty = document.getElementById('favorites-empty');
   const readLaterEmpty = document.getElementById('read-later-empty');
   const savedEmpty = document.getElementById('saved-empty');
 
   if (currentSearchQuery) {
-    favoritesEmpty.textContent = 'No matching favorites found.';
     readLaterEmpty.textContent = 'No matching articles found.';
     savedEmpty.textContent = 'No matching articles found.';
+  } else if (currentScope === 'favorites') {
+    readLaterEmpty.textContent = 'No favorite articles in Read Later.';
+    savedEmpty.textContent = 'No favorite articles in Saved.';
   } else {
-    favoritesEmpty.textContent = 'No favorite articles yet. Click the star on any article to add it to favorites.';
     readLaterEmpty.textContent = 'No articles in your reading list. Click the extension icon on any page to add one.';
     savedEmpty.textContent = 'No saved articles yet.';
   }
 
-  favoritesEmpty.classList.toggle('visible', favorites.length === 0 && (currentScope === 'favorites' || currentScope === 'all'));
-  readLaterEmpty.classList.toggle('visible', readLater.length === 0 && currentScope !== 'saved' && currentScope !== 'favorites');
-  savedEmpty.classList.toggle('visible', saved.length === 0 && currentScope !== 'read-later' && currentScope !== 'favorites');
+  readLaterEmpty.classList.toggle('visible', readLater.length === 0 && currentScope !== 'saved');
+  savedEmpty.classList.toggle('visible', saved.length === 0 && currentScope !== 'read-later');
 
   // Show/hide sections based on scope
   const isHighlightsScope = currentScope === 'highlights';
 
-  document.getElementById('favorites-section').style.display =
-    (currentScope === 'read-later' || currentScope === 'saved' || isHighlightsScope) ? 'none' :
-    (currentScope === 'all' && favorites.length === 0 ? 'none' : 'block');
   document.getElementById('read-later-section').style.display =
-    (currentScope === 'saved' || currentScope === 'favorites' || isHighlightsScope) ? 'none' : 'block';
+    (currentScope === 'saved' || isHighlightsScope) ? 'none' : 'block';
   document.getElementById('saved-section').style.display =
-    (currentScope === 'read-later' || currentScope === 'favorites' || isHighlightsScope) ? 'none' :
+    (currentScope === 'read-later' || isHighlightsScope) ? 'none' :
     (currentScope === 'all' && saved.length === 0 ? 'none' : 'block');
 
   // Handle highlights section
