@@ -41,6 +41,26 @@ async function init() {
       loadArticles();
     }
   });
+
+  // Setup export/import
+  document.getElementById('export-btn').addEventListener('click', exportData);
+  document.getElementById('import-btn').addEventListener('click', () => {
+    document.getElementById('import-file').click();
+  });
+  document.getElementById('import-file').addEventListener('change', importData);
+
+  // Load last export date
+  loadLastExportDate();
+}
+
+async function loadLastExportDate() {
+  const { lastExportDate } = await chrome.storage.local.get(['lastExportDate']);
+  const el = document.getElementById('last-export');
+  if (lastExportDate) {
+    el.textContent = `Last backup: ${formatDate(lastExportDate)}`;
+  } else {
+    el.textContent = 'No backup yet';
+  }
 }
 
 async function loadArticles() {
@@ -362,4 +382,69 @@ function createGroupedHighlightCard(group) {
   });
 
   return card;
+}
+
+// Export data to JSON file
+async function exportData() {
+  const exportDate = new Date().toISOString();
+  const data = {
+    version: 1,
+    exportedAt: exportDate,
+    articles: allArticles,
+    highlights: allHighlights
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `reader-backup-${exportDate.split('T')[0]}.json`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+
+  // Save last export date
+  await chrome.storage.local.set({ lastExportDate: exportDate });
+  loadLastExportDate();
+}
+
+// Import data from JSON file
+async function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    if (!data.version || !data.articles) {
+      alert('Invalid backup file format.');
+      return;
+    }
+
+    // Confirm import
+    const articleCount = data.articles?.length || 0;
+    const highlightCount = Object.values(data.highlights || {}).reduce((sum, h) => sum + h.length, 0);
+
+    if (!confirm(`Import ${articleCount} articles and ${highlightCount} highlights?\n\nThis will replace your current data.`)) {
+      return;
+    }
+
+    // Save to storage
+    await chrome.storage.local.set({
+      articles: data.articles || [],
+      highlights: data.highlights || {}
+    });
+
+    // Reload
+    await loadArticles();
+    alert('Import successful!');
+
+  } catch (err) {
+    alert('Failed to import: ' + err.message);
+  }
+
+  // Reset file input
+  e.target.value = '';
 }
